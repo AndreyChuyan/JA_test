@@ -24,7 +24,7 @@ build_image:
 push_image:
   stage: push
   tags:
-  - shell
+    - shell
   script:
     - docker push $IMAGE_NAME:$IMAGE_TAG
   only: 
