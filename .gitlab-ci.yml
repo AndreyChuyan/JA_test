@@ -10,7 +10,6 @@ before_script:
   # Логинимся в GitLab Container Registry
   - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin $CI_REGISTRY
 
-
 build_image:
   stage: build
   tags:
@@ -18,8 +17,12 @@ build_image:
   script:
     - pwd # чтобы увидеть текущую директорию
     - ls # чтобы увидеть список файлов
-    - docker build -t nginx-image:latest apps/nginx/.
+    - docker build --cache-from $IMAGE_NAME:$IMAGE_TAG -t $IMAGE_NAME:$IMAGE_TAG apps/nginx/.
     # - docker tag nginx-image:latest ${CI_REGISTRY_IMAGE}:latest
+  artifacts:
+    paths:
+      - Dockerfile
+    expire_in: 1 hour
 
 push_image:
   stage: push
