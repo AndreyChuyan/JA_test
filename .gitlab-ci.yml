@@ -6,8 +6,8 @@ build_docker_image:
   tags:
     - shell       # Укажите тег Runner'а
   script:
-  - pwd  # Вывод текущей директории
-  - ls   # Вывод списка файлов для проверки
+  # - pwd  
+  # - ls   
   - docker build -t nginx-image:latest apps/nginx/.  # Сборка Docker-образа
   - echo "CI Registry Image: ${CI_REGISTRY_IMAGE}"  # Проверка значения переменной CI_REGISTRY_IMAGE
   - if [ -z "${CI_REGISTRY_IMAGE}" ]; then echo "CI_REGISTRY_IMAGE is empty"; exit 1; fi  # Проверка на пустое значение
