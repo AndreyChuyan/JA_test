@@ -20,10 +20,10 @@ build_image:
     - ls # чтобы увидеть список файлов
     - docker build --cache-from $IMAGE_NAME:$IMAGE_TAG -t $IMAGE_NAME:$IMAGE_TAG apps/nginx/.
     # - docker tag nginx-image:latest ${CI_REGISTRY_IMAGE}:latest
-  artifacts:
-    paths:
-      - Dockerfile
-    expire_in: 1 hour
+  # artifacts:
+  #   paths:
+  #     - Dockerfile
+  #   expire_in: 1 hour
 
 push_image:
   stage: push
