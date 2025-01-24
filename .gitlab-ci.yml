@@ -5,7 +5,7 @@ stages:
 variables:
   IMAGE_NAME: $CI_REGISTRY_IMAGE
   IMAGE_TAG: $CI_COMMIT_REF_SLUG
-  CI_REGISTRY: gitlab.ch:5050
+  CI_REGISTRY: http://gitlab.ch:5050
 
 before_script:
   # Логинимся в GitLab Container Registry
