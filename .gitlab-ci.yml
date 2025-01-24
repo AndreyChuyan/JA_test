@@ -1,13 +1,3 @@
-# настройка docker socket
-# /etc/gitlab-runner/config.toml
-# [[runners]]
-#      executor = "docker"
-#      [runners.docker]
-#        image = "docker:latest"
-#        privileged = true
-#        volumes = ["/var/run/docker.sock:/var/run/docker.sock", "/cache"]
-# sudo systemctl restart gitlab-runner
-
 stages:
   - build
 
@@ -16,7 +6,7 @@ build_docker_image:
   tags:
     - docker        # Укажите тег Runner'а
   script:
-    - docker build -t nginx-image:latest ./nginx/
+    - docker build -t nginx-image:latest nginx/
     - docker tag nginx-image:latest ${CI_REGISTRY_IMAGE}:latest
     - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" "${CI_REGISTRY}"
     - docker push ${CI_REGISTRY_IMAGE}:latest
