@@ -54,9 +54,9 @@ test_image:
     # Проверка доступности конкретных эндпоинтов
     - >
       if curl -f $TEST_ENDPOINT; then
-        echo "Эндпоинт /docs доступен."
+        echo "Эндпоинт $TEST_ENDPOINT доступен."
       else
-        echo "Эндпоинт /docs недоступен." && exit 1
+        echo "Эндпоинт $TEST_ENDPOINT недоступен." && exit 1
       fi
 
     # Остановка и удаление контейнера после тестов
