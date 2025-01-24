@@ -11,6 +11,7 @@ build_docker_image:
     - docker build -t nginx-image:latest apps/nginx/.
     - echo "'${CI_REGISTRY_IMAGE}'
     - echo "ALL ENV VARIABLES:"
+    - env
     # - docker tag nginx-image:latest ${CI_REGISTRY_IMAGE}:latest
     # - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" "${CI_REGISTRY}"
     # - docker push ${CI_REGISTRY_IMAGE}:latest
