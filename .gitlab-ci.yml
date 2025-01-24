@@ -6,13 +6,10 @@ build_docker_image:
   tags:
     - shell       # Укажите тег Runner'а
   script:
-  # - pwd  
-  # - ls   
-  - docker build -t nginx-image:latest apps/nginx/.  # Сборка Docker-образа
-  - echo "CI Registry Image: ${CI_REGISTRY_IMAGE}"  # Проверка значения переменной CI_REGISTRY_IMAGE
-  - if [ -z "${CI_REGISTRY_IMAGE}" ]; then echo "CI_REGISTRY_IMAGE is empty"; exit 1; fi  # Проверка на пустое значение
-  - docker tag nginx-image:latest ${CI_REGISTRY_IMAGE}:latest  # Тегирование образа
-  - echo "Logging in to Docker registry..."  # Сообщение о начале входа
-  - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" "${CI_REGISTRY}"  # Вход в реестр
-  - echo "Pushing image to registry..."  # Сообщение о начале отправки
-  - docker push ${CI_REGISTRY_IMAGE}:latest  # Отправка образа в реестр
+    - pwd # чтобы увидеть текущую директорию
+    - ls # чтобы увидеть список файлов
+    - docker build -t nginx-image:latest apps/nginx/.
+    - echo "${CI_REGISTRY_IMAGE}"
+    - docker tag nginx-image:latest ${CI_REGISTRY_IMAGE}:latest
+    - docker login -u "$CI_REGISTRY_USER" -p "$CI_REGISTRY_PASSWORD" "${CI_REGISTRY}"
+    - docker push ${CI_REGISTRY_IMAGE}:latest
