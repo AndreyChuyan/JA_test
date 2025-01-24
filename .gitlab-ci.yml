@@ -3,6 +3,7 @@
 # [[runners]]
 #      executor = "docker"
 #      [runners.docker]
+#        image = "docker:latest"
 #        privileged = true
 #        volumes = ["/var/run/docker.sock:/var/run/docker.sock", "/cache"]
 # sudo systemctl restart gitlab-runner
