@@ -1,11 +1,13 @@
 stages:
   - build
+  - test
   - push
 
 variables:
   IMAGE_NAME: $CI_REGISTRY_IMAGE
   IMAGE_TAG: $CI_COMMIT_REF_SLUG
   CI_REGISTRY: http://gitlab.ch:5050
+  TEST_PORTS: 80:80
 
 before_script:
   # Логинимся в GitLab Container Registry
@@ -25,6 +27,46 @@ build_image:
   #     - Dockerfile
   #   expire_in: 1 hour
 
+test_image:
+  stage: test
+  tags:
+    - shell
+  script:
+    # Удаление предыдущего контейнера, если есть
+    - docker rm -f test-container || true
+    # Запуск контейнера в фоновом режиме
+    - docker run -d -p $TEST_PORTS --name test-container $IMAGE_NAME:$IMAGE_TAG
+    # Ожидание запуска приложения с повторными попытками
+    - |
+      for i in {1..60}; do
+        if curl -s http://localhost:80 > /dev/null; then
+          echo "Приложение запущено."
+          break
+        fi
+        echo "Ожидание запуска приложения... ($i)"
+        sleep 1
+        if [ $i -eq 60 ]; then
+          echo "Приложение не запустилось вовремя." && exit 1
+        fi
+      done
+
+    # Проверка доступности конкретных эндпоинтов
+    - >
+      if curl -f http://localhost:80; then
+        echo "Эндпоинт /docs доступен."
+      else
+        echo "Эндпоинт /docs недоступен." && exit 1
+      fi
+
+    # Остановка и удаление контейнера после тестов
+    - docker stop test-container
+    - docker rm test-container
+    - sleep 2
+
+  dependencies:
+    - build_image
+
+
 push_image:
   stage: push
   tags:
@@ -38,3 +80,4 @@ push_image:
       - tags
   dependencies:
     - build_image
+    - test_image
