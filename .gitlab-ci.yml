@@ -4,7 +4,7 @@ stages:
 build_docker_image:
   stage: build
   tags:
-    - docker        # Укажите тег Runner'а
+    - shell       # Укажите тег Runner'а
   script:
     - pwd # чтобы увидеть текущую директорию
     - ls # чтобы увидеть список файлов
