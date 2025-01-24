@@ -1,0 +1,85 @@
+stages:
+  - build
+  - test
+  - push
+
+variables:
+  IMAGE_NAME: $CI_REGISTRY_IMAGE
+  IMAGE_TAG: $CI_COMMIT_REF_SLUG
+  CI_REGISTRY: http://gitlab.ch:5050
+  TEST_PORTS: 80:80
+  TEST_ENDPOINT: http://localhost:80
+
+before_script:
+  # Логинимся в GitLab Container Registry
+  - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin $CI_REGISTRY
+
+build_image:
+  stage: build
+  tags:
+    - shell
+  script:
+    - pwd # чтобы увидеть текущую директорию
+    - ls # чтобы увидеть список файлов
+    - docker build --cache-from $IMAGE_NAME:$IMAGE_TAG -t $IMAGE_NAME:$IMAGE_TAG apps/nginx/.
+    # - docker tag nginx-image:latest ${CI_REGISTRY_IMAGE}:latest
+  # artifacts:
+  #   paths:
+  #     - Dockerfile
+  #   expire_in: 1 hour
+
+test_image:
+  stage: test
+  tags:
+    - shell
+  script:
+    # Удаление предыдущего контейнера, если есть
+    - docker rm -f test-container || true
+    # Запуск контейнера в фоновом режиме
+    - docker run -d -p $TEST_PORTS --name test-container $IMAGE_NAME:$IMAGE_TAG
+    # Ожидание запуска приложения с повторными попытками
+    - |
+      for i in {1..60}; do
+        if curl -s $TEST_ENDPOINT > /dev/null; then
+          echo "Приложение запущено."
+          break
+        fi
+        echo "Ожидание запуска приложения... ($i)"
+        sleep 1
+        if [ $i -eq 60 ]; then
+          echo "Приложение не запустилось вовремя." && exit 1
+        fi
+      done
+
+    # Проверка доступности конкретных эндпоинтов
+    - >
+      if curl -f $TEST_ENDPOINT; then
+        echo "Эндпоинт $TEST_ENDPOINT доступен."
+      else
+        echo "Эндпоинт $TEST_ENDPOINT недоступен." && exit 1
+      fi
+
+    # Остановка и удаление контейнера после тестов
+    - docker stop test-container
+    - docker rm test-container
+    - sleep 2
+
+  dependencies:
+    - build_image
+
+
+push_image:
+  stage: push
+  tags:
+    - shell
+  script:
+    - docker push $IMAGE_NAME:$IMAGE_TAG
+  only: 
+    refs:
+      - main
+      - master
+      - tags
+  dependencies:
+    - build_image
+    - test_image
+    
