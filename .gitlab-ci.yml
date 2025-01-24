@@ -8,6 +8,7 @@ variables:
   IMAGE_TAG: $CI_COMMIT_REF_SLUG
   CI_REGISTRY: http://gitlab.ch:5050
   TEST_PORTS: 80:80
+  TEST_ENDPOINT: http://localhost:80
 
 before_script:
   # Логинимся в GitLab Container Registry
@@ -39,7 +40,7 @@ test_image:
     # Ожидание запуска приложения с повторными попытками
     - |
       for i in {1..60}; do
-        if curl -s http://localhost:80 > /dev/null; then
+        if curl -s $TEST_ENDPOINT > /dev/null; then
           echo "Приложение запущено."
           break
         fi
@@ -52,7 +53,7 @@ test_image:
 
     # Проверка доступности конкретных эндпоинтов
     - >
-      if curl -f http://localhost:80; then
+      if curl -f $TEST_ENDPOINT; then
         echo "Эндпоинт /docs доступен."
       else
         echo "Эндпоинт /docs недоступен." && exit 1
